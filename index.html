@@ -116,9 +116,15 @@
             margin-top: 20px;
         }
 
+        img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.15);
+            margin-top: 15px;
+        }
+
     </style>
 </head>
-
 
 <body>
 
@@ -142,7 +148,7 @@
         <h2>1. 다운로드</h2>
         <p>아래 버튼을 눌러 Screentouch 설치 파일을 다운로드하세요.</p>
 
-        <a href="https://drive.google.com/drive/folders/1E0tMb4kKXiqLvv5tQkOkEGGem9Q-TUxX?usp=drive_link"
+        <a href="https://drive.google.com/drive/folders/1E0tMb4kXiqLvv5tQkOkEGGem9Q-TUxX?usp=drive_link"
            target="_blank"
            style="
                 display:inline-block;
@@ -162,27 +168,33 @@
 
         <h2 style="margin-top:35px;">2. 설치 진행</h2>
         <p>다운로드한 Setup.exe 파일을 실행하여 설치를 진행합니다.</p>
+        <h2>아래 영상을 참고하여 설치를 진행하세요</h2>
 
-        <h2>3. 설치 완료</h2>
-        <p>설치가 완료되면 바탕화면 또는 시작 메뉴에서 Screentouch를 실행하세요.</p>
+        <!-- 설치 GIF -->
+        <img src="result.gif" alt="설치 진행 GIF">
     </section>
 
     <!-- Usage -->
     <section id="usage">
         <h1>사용 설명서</h1>
 
-        <h2>터치 제스처</h2>
+        <h2>실행방법</h2>
+        <p>아래 영상을 참고하여 실행하세요</p>
+
+        <!-- 실행 GIF -->
+        <img src="result(1).gif" alt="실행 GIF">
+
         <ul>
-            <li>탭 → 좌클릭</li>
-            <li>드래그 → 스크롤/이동</li>
-            <li>롱프레스 → 길게 누르기</li>
+            <li>검지이동 → 마우스이동</li>
+            <li>집게 손 한번 → 클릭</li>
+            <li>집게 손 길게 → 드래그</li>
         </ul>
 
         <h2>설정 기능</h2>
         <ul>
-            <li>감도 조절</li>
-            <li>롱프레스 시간 조절</li>
-            <li>자동 실행 설정</li>
+            <li>감도 조절 z/x</li>
+            <li>마우스 일시중지 m</li>
+            <li>종료 q</li>
         </ul>
     </section>
 
@@ -220,7 +232,6 @@
 
 </div>
 
-
 <!-- Firebase Script -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
@@ -240,10 +251,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-
-    /* ===========================
-        1. 질문 제출
-    ============================ */
     window.submitQuestion = function () {
         const id = qid.value.trim();
         const pw = qpw.value.trim();
@@ -264,10 +271,6 @@
         qtext.value = "";
     };
 
-
-    /* ===========================
-        2. 내 질문 불러오기
-    ============================ */
     window.loadMyQuestion = async function () {
         const id = view_id.value.trim();
         const pw = view_pw.value.trim();
@@ -291,16 +294,11 @@
             return;
         }
 
-        // Load data
         myQuestionBox.classList.remove("hidden");
         myQuestionText.value = data.question;
         myAnswer.innerText = data.answer;
     };
 
-
-    /* ===========================
-        3. 질문 수정
-    ============================ */
     window.updateMyQuestion = async function () {
         const id = view_id.value.trim();
         const pw = view_pw.value.trim();
@@ -320,14 +318,9 @@
         }
 
         update(ref(db, "questions/" + id), { question: newQ });
-
         alert("질문이 수정되었습니다.");
     };
 
-
-    /* ===========================
-        4. 질문 삭제
-    ============================ */
     window.deleteMyQuestion = async function () {
         const id = view_id.value.trim();
         const pw = view_pw.value.trim();
@@ -344,7 +337,6 @@
         alert("질문이 삭제되었습니다.");
         myQuestionBox.classList.add("hidden");
     };
-
 </script>
 
 </body>

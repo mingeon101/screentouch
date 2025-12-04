@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Screentouch 사용설명서</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            display: flex;
+            background: linear-gradient(135deg, #eef2f3, #dfe9f3);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: #1e272e;
+            color: #fff;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 30px;
+            box-sizing: border-box;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.25);
+        }
+
+        .sidebar h2 {
+            font-size: 24px;
+            margin-bottom: 28px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 18px 0;
+        }
+
+        .sidebar ul li a {
+            color: #dfe6e9;
+            text-decoration: none;
+            font-size: 17px;
+            transition: 0.25s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #74b9ff;
+        }
+
+        /* Content */
+        .content {
+            margin-left: 260px;
+            padding: 50px;
+            width: calc(100% - 260px);
+            box-sizing: border-box;
+        }
+
+        section {
+            background: #ffffff;
+            margin-bottom: 50px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow:
+                5px 5px 15px rgba(0,0,0,0.08),
+                -5px -5px 15px rgba(255,255,255,0.9);
+        }
+
+        h1 { font-size: 30px; margin-top: 0; }
+        h2 { font-size: 23px; margin-top: 30px; }
+
+        /* Input & Button */
+        input, textarea, button {
+            font-family: inherit;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 14px;
+            margin-top: 12px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            background: #f5f6fa;
+            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.1),
+                        inset -3px -3px 8px rgba(255,255,255,0.9);
+        }
+
+        textarea {
+            height: 130px;
+            resize: none;
+        }
+
+        button {
+            margin-top: 18px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: none;
+            background: #0984e3;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        button:hover { background: #74b9ff; }
+
+        .hidden { display: none; }
+
+        .answer-box {
+            background: #dfe6e9;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>Screentouch</h2>
+    <ul>
+        <li><a href="#install">설치 방법</a></li>
+        <li><a href="#usage">사용설명서</a></li>
+        <li><a href="#question">질문하기</a></li>
+    </ul>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+    <!-- Install -->
+    <section id="install">
+        <h1>설치 방법</h1>
+        <p>Setup.exe 다운로드 후 설치합니다.</p>
+    </section>
+
+    <!-- Usage -->
+    <section id="usage">
+        <h1>사용 설명서</h1>
+        <p>터치 제스처 및 설정 기능 안내...</p>
+    </section>
+
+    <!-- Question System -->
+    <section id="question">
+        <h1>질문하기</h1>
+
+        <h2>1. 질문 제출</h2>
+        <input id="qid" type="text" placeholder="아이디 입력">
+        <input id="qpw" type="password" placeholder="비밀번호 입력">
+        <textarea id="qtext" placeholder="질문 내용"></textarea>
+        <button onclick="submitQuestion()">질문 제출</button>
+
+        <hr style="margin:40px 0;">
+
+        <h2>2. 나의 질문 조회 / 수정 / 삭제</h2>
+        <input id="view_id" type="text" placeholder="아이디 입력">
+        <input id="view_pw" type="password" placeholder="비밀번호 입력">
+        <button onclick="loadMyQuestion()">내 질문 보기</button>
+
+        <div id="myQuestionBox" class="hidden">
+            <h3>나의 질문</h3>
+            <textarea id="myQuestionText"></textarea>
+
+            <h3>관리자 답변</h3>
+            <div class="answer-box">
+                <p id="myAnswer"></p>
+            </div>
+
+            <button onclick="updateMyQuestion()">질문 수정</button>
+            <button onclick="deleteMyQuestion()" style="background:#d63031;">질문 삭제</button>
+        </div>
+
+    </section>
+
+</div>
+
+
+<!-- Firebase Script -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, set, get, update, remove } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD5LF-_E3X4Ix4JDiBJFIqzoa0aKk6qoQ4",
+        authDomain: "screentouch-d9ad3.firebaseapp.com",
+        databaseURL: "https://screentouch-d9ad3-default-rtdb.firebaseio.com/",
+        projectId: "screentouch-d9ad3",
+        storageBucket: "screentouch-d9ad3.firebasestorage.app",
+        messagingSenderId: "576628623458",
+        appId: "1:576628623458:web:c54a8e03de793a866ba93b",
+        measurementId: "G-5TS2P0EQVE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+
+    /* ===========================
+        1. 질문 제출
+    ============================ */
+    window.submitQuestion = function () {
+        const id = qid.value.trim();
+        const pw = qpw.value.trim();
+        const text = qtext.value.trim();
+
+        if (!id || !pw || !text) {
+            alert("모든 항목을 입력하세요.");
+            return;
+        }
+
+        set(ref(db, "questions/" + id), {
+            password: pw,
+            question: text,
+            answer: "답변 대기중"
+        });
+
+        alert("질문이 등록되었습니다!");
+        qtext.value = "";
+    };
+
+
+    /* ===========================
+        2. 내 질문 불러오기
+    ============================ */
+    window.loadMyQuestion = async function () {
+        const id = view_id.value.trim();
+        const pw = view_pw.value.trim();
+
+        if (!id || !pw) {
+            alert("ID와 PW를 입력하세요.");
+            return;
+        }
+
+        const snap = await get(ref(db, "questions/" + id));
+
+        if (!snap.exists()) {
+            alert("해당 ID로 등록된 질문이 없습니다.");
+            return;
+        }
+
+        const data = snap.val();
+
+        if (data.password !== pw) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        // Load data
+        myQuestionBox.classList.remove("hidden");
+        myQuestionText.value = data.question;
+        myAnswer.innerText = data.answer;
+    };
+
+
+    /* ===========================
+        3. 질문 수정
+    ============================ */
+    window.updateMyQuestion = async function () {
+        const id = view_id.value.trim();
+        const pw = view_pw.value.trim();
+        const newQ = myQuestionText.value.trim();
+
+        if (!newQ) {
+            alert("질문을 입력하세요.");
+            return;
+        }
+
+        const snap = await get(ref(db, "questions/" + id));
+        if (!snap.exists()) return;
+
+        if (snap.val().password !== pw) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        update(ref(db, "questions/" + id), { question: newQ });
+
+        alert("질문이 수정되었습니다.");
+    };
+
+
+    /* ===========================
+        4. 질문 삭제
+    ============================ */
+    window.deleteMyQuestion = async function () {
+        const id = view_id.value.trim();
+        const pw = view_pw.value.trim();
+
+        const snap = await get(ref(db, "questions/" + id));
+        if (!snap.exists()) return;
+
+        if (snap.val().password !== pw) {
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        remove(ref(db, "questions/" + id));
+        alert("질문이 삭제되었습니다.");
+        myQuestionBox.classList.add("hidden");
+    };
+
+</script>
+
+</body>
+</html>
